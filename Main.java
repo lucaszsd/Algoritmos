@@ -1,11 +1,8 @@
-import java.lang.invoke.SwitchPoint;
-import java.util.Scanner;
-
+import java.io.*;
+import java.util.*;
 
 public class Main {
-	
-	
-	public static void main(String[] args) {
+  public static void main(String[] args) {
 
 		Scanner in = new Scanner(System.in);
 		
@@ -23,9 +20,9 @@ public class Main {
 		Memory m = new Memory();
 		Buffer b = new Buffer(q);
 			
-		for(int j = 0; j < 10; ++j){
-			
-			
+		//for(int j = 0; j < 9; ++j){
+		while(in.hasNext()){
+		
 			instruction = in.next();
 			k = in.nextInt();
 			
@@ -50,9 +47,9 @@ public class Main {
 								aux = b.remove();
 								System.out.print(aux + " ");
 							}
-						}
-						System.out.println();
-					}					
+						}						
+					}
+					System.out.println();
 					break;				
 				default:
 					break;	
@@ -65,10 +62,6 @@ public class Main {
 					b.add(m.pop());
 				}
 			}
-			
-			
-			
-
 		}
 		
 		
@@ -90,10 +83,7 @@ public class Main {
 		in.close();
 		
 	}
-	
-	
 }
-
 
 
 class Memory{
@@ -102,7 +92,7 @@ class Memory{
 	int topo;
 	
 	public Memory(){
-		elements = new int[600];
+		elements = new int[1500];
 		topo = -1; //posicao invalida do vetor
 	}
 	
