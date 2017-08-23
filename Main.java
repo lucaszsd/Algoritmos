@@ -12,76 +12,77 @@ public class Main {
 		int q, p, k;
 		String instruction;
 		
-		int cont = 0;
-		int aux = 0;
-		int i_cont = 0;
+		int cont = -1;
 		
 		q = in.nextInt();
 		p = in.nextInt();
+		
+		int aux;
+		int i_cont = 0;
 	
 		Memory m = new Memory();
 		Buffer b = new Buffer(q);
-		
-		for(int i = 0; i < 32; ++i){
+			
+		for(int j = 0; j < 10; ++j){
+			
 			
 			instruction = in.next();
 			k = in.nextInt();
 			
-				
-			switch(instruction){
+			i_cont++;
 			
+			switch(instruction){
 				case "RECV":
-					for(int j = 0; j < k; ++j){	
-						if(!b.isEmpty()){
+					for(int i = 0; i < k; ++i){
+						cont++;
+						if(!b.isFull()){
 							b.add(cont);
 						}else{
 							m.push(cont);
 						}
-						cont ++;
 					}
 					break;
-					
 					
 				case "SEND":
 					if(!b.isEmpty()){
-						if(k >= q){
-							while(!b.isEmpty()){
+						for(int i = 0; i < k; ++i){
+							if(!b.isEmpty()){
 								aux = b.remove();
-								System.out.print(aux +" ");
-							}
-						}else{
-							for(int j = 0; j < k; ++j){
-								aux = b.remove();
-								System.out.print(aux +" ");
+								System.out.print(aux + " ");
 							}
 						}
-					}else{
 						System.out.println();
-					}
-					break;
+					}					
+					break;				
 				default:
-					break;
-					
-					
+					break;	
 			}
 			
 			
 			if(i_cont == p){
 				i_cont = 0;
 				while(!b.isFull() && !m.isEmpty()){
-					b.add(m.pop());	
-				}				
+					b.add(m.pop());
+				}
 			}
 			
 			
 			
 
-		
-
 		}
 		
 		
+		while(!b.isEmpty()){
+			aux = b.remove();
+			System.out.print(aux + " ");
+		}
 		
+		System.out.println();
+		
+		while(!m.isEmpty()){
+			aux = m.pop();
+			System.out.print(aux + " ");
+		}
 		
 		
 		
@@ -93,13 +94,15 @@ public class Main {
 	
 }
 
+
+
 class Memory{
 	
 	int elements[];
 	int topo;
 	
 	public Memory(){
-		elements = new int[500];
+		elements = new int[600];
 		topo = -1; //posicao invalida do vetor
 	}
 	
