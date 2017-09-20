@@ -32,9 +32,30 @@ class directory{
 class file{
 	
 	char name;
+	file left;
+	file right;
+	
 	
 	public file(char _name){
-		this.name = _name;
+		if((int)_name <= (int)this.name){
+			if(this.left = null){
+				this.left = new file(_name)
+			}else{
+				this.left.add(_name);
+			}
+		}else{
+			if(this.right = null){
+				this.right = new file(_name)
+			}else{
+				this.right.add(_name);
+			}
+		
+		}
+		
+	
+	
+	public void add(String name){
+		
 	}
 	
 }
@@ -61,14 +82,14 @@ class filesystem{
 			case "cd":
 				target = _inst.split(" ")[1];
 				break;
-			//lista elementos do diretório
+			//lista elementos do diretÃ³rio
 			case "ls":
 				break;
 			//cria novo arquivo no diretorio atual
 			case "touch":
 				target = _inst.split(" ")[1];
 				break;
-			//cria diretório
+			//cria diretÃ³rio
 			case "mkdir":
 				target = _inst.split(" ")[1];
 				break;
