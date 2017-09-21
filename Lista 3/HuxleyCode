@@ -1,0 +1,227 @@
+import java.util.ArrayList;
+
+public class HuxleyCode {
+
+	public static void main(String[] args) {
+		
+		tree t = new tree(6);
+		
+		t.add(2);
+		t.add(1);
+		t.add(4);
+		t.add(3);
+		t.add(5);
+		t.add(7);
+		t.add(9);
+		t.add(10);
+		
+		t.inorder();
+		
+		t.remove(2, t);
+		
+		t.inorder();
+
+	}
+
+}
+
+
+
+
+
+
+class file{
+	
+	char name;
+	
+	public file(char _name){
+		this.name = _name;
+	}
+	
+}
+
+class directory extends file{
+	
+	char name;
+	tree files;
+	
+	public directory(char _name,directory _parent){
+		super(_name);
+		files = new tree(-1);
+	}
+
+
+}
+
+
+class filesystem{
+	
+	directory actualdirectory;
+	directory root;
+	
+	public filesystem() {
+		//root serve como referencia para a raiz do sistema de arquivos
+		root = new directory('/', null);
+		this.actualdirectory = root;
+	}
+	
+	
+	public void instruction(String _inst){
+		String inst = _inst.split(" ")[0];
+		String target = "";
+		
+		switch(inst){
+		
+			//entra no diretorio
+			case "cd":
+				target = _inst.split(" ")[1];
+				break;
+			//lista elementos do diretório
+			case "ls":
+				break;
+			//cria novo arquivo no diretorio atual
+			case "touch":
+				target = _inst.split(" ")[1];
+				break;
+			//cria diretório
+			case "mkdir":
+				target = _inst.split(" ")[1];
+				break;
+			//imprime nome do diretorio
+			case "pwd":
+				System.out.println(this.actualdirectory.name);
+				break;
+			//imprime a cadeia de diretorios conforme pedido
+			case "tree":
+				target = _inst.split(" ")[1];
+				break;
+			//deleta arquivo ou diretorio
+			case "rm":
+				target = _inst.split(" ")[1];
+				break;
+			default:
+				break;
+			
+		}
+		
+		
+		
+	}
+	
+}
+
+
+class tree{
+	
+	int value;
+	tree left;
+	tree right;
+	
+	public tree(int _value){
+		this.value = _value;
+	}
+	
+	
+	public void add(int _value){
+		
+		if(_value >= this.value){
+			if(this.right == null){
+				this.right = new tree(_value);
+			}else{
+				this.right.add(_value);
+			}
+		}else{
+			if(this.left == null){
+				this.left = new tree(_value);
+			}else{
+				this.left.add(_value);
+			}
+		}
+		
+	}
+	
+	
+	public boolean remove(int value, tree parent){
+        if (value < this.value) {
+              if (left != null)
+                    return left.remove(value, this);
+              else
+                    return false;
+        } else if (value > this.value) {
+              if (right != null)
+                    return right.remove(value, this);
+              else
+                    return false;
+        } else {
+              if (left != null && right != null) {
+                    this.value = right.minValue();
+                    right.remove(this.value, this);
+              } else if (parent.left == this) {
+                    parent.left = (left != null) ? left : right;
+              } else if (parent.right == this) {
+                    parent.right = (left != null) ? left : right;
+              }
+              return true;
+        }
+  }
+
+  public int minValue() {
+        if (left == null)
+              return value;
+        else
+              return left.minValue();
+  
+  }
+
+
+//--------------------------------------------
+  
+  
+//--------------------------------------------
+  
+	
+	public void inorder(){
+		
+		if(this.left != null){
+			this.left.inorder();
+		}
+		
+		System.out.println(this.value);
+		
+		if(this.right != null){
+			this.right.inorder();
+		}
+
+	}
+	
+	
+	public void preorder(){
+		
+		System.out.println(this.value);
+
+		if(this.left != null){
+			this.left.preorder();
+		}
+		
+		if(this.right != null){
+			this.right.preorder();
+		}
+		
+	}
+	
+	public void postorder(){
+		
+		if(this.left != null){
+			this.left.postorder();
+		}
+		
+		if(this.right != null){
+			this.right.postorder();
+		}
+		
+		System.out.println(this.value);
+		
+	}
+	
+	
+}
