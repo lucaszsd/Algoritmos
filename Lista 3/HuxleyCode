@@ -33,9 +33,11 @@ public class HuxleyCode {
 class file{
 	
 	char name;
+	String type;
 	
 	public file(char _name){
 		this.name = _name;
+		this.type = "file";
 	}
 	
 }
@@ -48,6 +50,16 @@ class directory extends file{
 	public directory(char _name,directory _parent){
 		super(_name);
 		files = new tree(-1);
+		this.type = "directory";
+		}
+	
+	
+	public void torch(){
+		
+	}
+	
+	public void makedir(){
+		
 	}
 
 
