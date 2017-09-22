@@ -1,26 +1,41 @@
 import java.util.ArrayList;
+import java.util.Scanner;
 
 public class HuxleyCode {
 
 	public static void main(String[] args) {
 		
-		tree t = new tree(6);
+		Scanner in = new Scanner(System.in);
 		
-		t.add(2);
-		t.add(1);
-		t.add(4);
-		t.add(3);
-		t.add(5);
-		t.add(7);
-		t.add(9);
-		t.add(10);
+		filesystem shell = new filesystem();
 		
-		t.inorder();
+		shell.instruction("cd");
 		
-		t.remove(2, t);
-		
-		t.inorder();
+		in.close();
 
+		
+//		tree t = new tree("h");
+//		
+//		t.add("b");
+//		t.add("a");
+//		t.add("d");
+//		t.add("c");
+//		t.add("e");
+//		t.add("g");
+//		t.add("i");
+//		t.add("j");
+//		
+//		t.inorder();
+//		
+//		System.out.println();
+//		
+//		t.remove("b", t);
+//		
+//		t.inorder();
+//		
+		
+		
+		
 	}
 
 }
@@ -29,7 +44,7 @@ public class HuxleyCode {
 
 
 
-
+//Representa um arquivo (ou diretório)
 class file{
 	
 	char name;
@@ -44,22 +59,63 @@ class file{
 
 class directory extends file{
 	
+	directory parent;
 	char name;
 	tree files;
 	
 	public directory(char _name,directory _parent){
 		super(_name);
-		files = new tree(-1);
+		this.parent = _parent;
+		files = new tree("/");
 		this.type = "directory";
 		}
+
 	
-	
-	public void torch(){
-		
+	//lista elementos do diretório
+	public void ls(){
+		this.files.inorder();
 	}
 	
-	public void makedir(){
+	
+	//cria novo arquivo no diretorio atual
+	public void torch(String _name){
+		//falsa search
+		this.files.add(_name);
+	}
+	
+	public void makedir(String _name){
+		//falsa search
+		this.files.add(_name);
+	}
+	
+	//imprime nome do diretorio
+	public void pwd(){
+		System.out.println(this.name);
+	}
+	
+	
+	//imprime a cadeia de diretorios conforme pedido
+	public void tree(String _type){
 		
+		switch (type) {
+		case "--pre-order":
+			files.preorder();
+			break;
+		case "--in-order":
+			files.inorder();
+			break;
+		case "--post-order":
+			files.postorder();
+			break;
+		default:
+			break;
+		}
+		System.out.println(this.name);
+	}
+	
+	//deleta arquivo ou diretorio
+	public void rm(String _name){
+		files.remove(_name, files);
 	}
 
 
@@ -87,9 +143,16 @@ class filesystem{
 			//entra no diretorio
 			case "cd":
 				target = _inst.split(" ")[1];
+				//subir de nivel
+				if(target.equals("..")){
+					actualdirectory = actualdirectory.parent;
+				}else{
+					
+				}
 				break;
 			//lista elementos do diretório
 			case "ls":
+				actualdirectory.ls();
 				break;
 			//cria novo arquivo no diretorio atual
 			case "touch":
@@ -125,49 +188,51 @@ class filesystem{
 
 class tree{
 	
-	int value;
+	String name;
 	tree left;
 	tree right;
 	
-	public tree(int _value){
-		this.value = _value;
+	public tree(String _name){
+		this.name = _name;
 	}
 	
 	
-	public void add(int _value){
+	
+	//Adiciona arquivo
+	public void add(String _name){
 		
-		if(_value >= this.value){
+		if(_name.compareTo(this.name) >= 0){
 			if(this.right == null){
-				this.right = new tree(_value);
+				this.right = new tree(_name);
 			}else{
-				this.right.add(_value);
+				this.right.add(_name);
 			}
 		}else{
 			if(this.left == null){
-				this.left = new tree(_value);
+				this.left = new tree(_name);
 			}else{
-				this.left.add(_value);
+				this.left.add(_name);
 			}
 		}
 		
 	}
 	
-	
-	public boolean remove(int value, tree parent){
-        if (value < this.value) {
+	//Remove arquivo
+	public boolean remove(String _name, tree parent){
+        if (_name.compareTo(this.name) < 0) {
               if (left != null)
-                    return left.remove(value, this);
+                    return left.remove(_name, this);
               else
                     return false;
-        } else if (value > this.value) {
+        } else if (_name.compareTo(this.name) > 0) {
               if (right != null)
-                    return right.remove(value, this);
+                    return right.remove(_name, this);
               else
                     return false;
         } else {
               if (left != null && right != null) {
-                    this.value = right.minValue();
-                    right.remove(this.value, this);
+                    this.name = right.minValue();
+                    right.remove(this.name, this);
               } else if (parent.left == this) {
                     parent.left = (left != null) ? left : right;
               } else if (parent.right == this) {
@@ -177,13 +242,46 @@ class tree{
         }
   }
 
-  public int minValue() {
-        if (left == null)
-              return value;
+	
+	public String minValue() {
+		if (left == null)
+        	return name;
         else
-              return left.minValue();
+        	return left.minValue();
+	}
   
+  
+  public boolean exists(String _name){
+	  
+	  boolean found = false;
+	  
+	  if(this.name.compareTo(_name) == 0){
+		  found = true;
+	  }else{
+		
+		  if(this.right != null){
+			  if(this.right.exists(_name)){
+				  found = true;
+			  }
+		  }
+		  
+		  if(this.left != null){
+			  if(this.left.exists(_name)){
+				  found = true;
+			  }
+		  }
+		  
+	  }
+	  
+	  return found;
+	  
   }
+  
+  
+  
+
+  
+  
 
 
 //--------------------------------------------
@@ -198,7 +296,7 @@ class tree{
 			this.left.inorder();
 		}
 		
-		System.out.println(this.value);
+		System.out.println(this.name);
 		
 		if(this.right != null){
 			this.right.inorder();
@@ -209,7 +307,7 @@ class tree{
 	
 	public void preorder(){
 		
-		System.out.println(this.value);
+		System.out.println(this.name);
 
 		if(this.left != null){
 			this.left.preorder();
@@ -231,7 +329,7 @@ class tree{
 			this.right.postorder();
 		}
 		
-		System.out.println(this.value);
+		System.out.println(this.name);
 		
 	}
 	
