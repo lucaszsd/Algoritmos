@@ -1,189 +1,204 @@
 import java.util.ArrayList;
+import java.util.Scanner;
 
 public class HuxleyCode {
 
 	public static void main(String[] args) {
 		
-		tree t = new tree(6);
+		Scanner in = new Scanner(System.in);
 		
-		t.add(2);
-		t.add(1);
-		t.add(4);
-		t.add(3);
-		t.add(5);
-		t.add(7);
-		t.add(9);
-		t.add(10);
+		filesystem shell = new filesystem();
 		
-		t.inorder();
 		
-		t.remove(2, t);
+		shell.instruction("pwd");
+		shell.instruction("mkdir Q");
+		shell.instruction("mkdir A");
+		shell.instruction("mkdir Z");
+		shell.instruction("cd A");
+		shell.instruction("touch W");
+		shell.instruction("touch S");
+		shell.instruction("touch X");
+		shell.instruction("cd S");
+		shell.instruction("touch 1");
+		shell.instruction("touch 0");
+		shell.instruction("touch 2");
+		shell.instruction("touch 9");
+		shell.instruction("cd ..");
+		shell.instruction("cd Q");
+		shell.instruction("touch E");
+		shell.instruction("touch D");
+		shell.instruction("cd ..");
+		shell.instruction("cd Z");
+		shell.instruction("touch X");
+		shell.instruction("cd ..");
+		shell.instruction("tree --in-order");
 		
-		t.inorder();
+		
+//		System.out.println(shell.actualdirectory.exists("A"));
+//		System.out.println(shell.actualdirectory.search("A"));
+	
+		
+		
+	
+		in.close();
 
+		
 	}
 
 }
-
-
-
-
 
 
 class file{
 	
-	char name;
+	String name;
 	String type;
+	file left;
+	file right;
 	
-	public file(char _name){
+	public file(String _name, String _type){
 		this.name = _name;
-		this.type = "file";
+		this.type = _type;
+		
+		this.left = null;
+		this.right = null;
+		
 	}
 	
-}
-
-class directory extends file{
 	
-	char name;
-	tree files;
 	
-	public directory(char _name,directory _parent){
-		super(_name);
-		files = new tree(-1);
-		this.type = "directory";
+	//Adiciona arquivo
+	public void add(file _arquivo){
+		
+		if(this != null){
+			
+			if(_arquivo.name.compareTo(this.name) >= 0){
+				if(this.right == null){
+					this.right = _arquivo;
+				}else{
+					this.right.add(_arquivo);
+				}
+			}else{
+				if(this.left == null){
+					this.left = _arquivo;
+				}else{
+					this.left.add(_arquivo);
+				}
+			}
+			
+		}else{
+			this.name = _arquivo.name;
+			this.type = _arquivo.type;
+			this.left = null;
+			this.right = null;
 		}
-	
-	
-	public void torch(){
+		
 		
 	}
 	
-	public void makedir(){
-		
+	
+	//Remove arquivo
+	public boolean remove(String _name, file parent){
+		if(_name.compareTo(this.name) < 0) {
+			if(left != null){
+				return left.remove(_name, this);
+			}else{
+				return false;
+			}
+			}else if(_name.compareTo(this.name) > 0){
+				if (right != null){
+					return right.remove(_name, this);
+				}else{
+					return false;
+				}
+			}else{
+				if(left != null && right != null){
+					this.name = right.minValue();
+					right.remove(this.name, this);
+				}else if(parent.left == this){
+					parent.left = (left != null) ? left : right;
+				}else if(parent.right == this) {
+					parent.right = (left != null) ? left : right;
+				}
+			return true;
+        }
 	}
 
-
-}
-
-
-class filesystem{
-	
-	directory actualdirectory;
-	directory root;
-	
-	public filesystem() {
-		//root serve como referencia para a raiz do sistema de arquivos
-		root = new directory('/', null);
-		this.actualdirectory = root;
+	//Encontra menor valor
+	public String minValue(){
+		if (left == null){
+        	return this.name;
+		}else{
+        	return left.minValue();
+		}
 	}
-	
-	
-	public void instruction(String _inst){
-		String inst = _inst.split(" ")[0];
-		String target = "";
+  
+  
+	//Verifica se existe o elemento na arvore
+	public boolean exists(String _name){
+	  
+		boolean found = false;
+	  
+		if(this != null){
 		
-		switch(inst){
-		
-			//entra no diretorio
-			case "cd":
-				target = _inst.split(" ")[1];
-				break;
-			//lista elementos do diretório
-			case "ls":
-				break;
-			//cria novo arquivo no diretorio atual
-			case "touch":
-				target = _inst.split(" ")[1];
-				break;
-			//cria diretório
-			case "mkdir":
-				target = _inst.split(" ")[1];
-				break;
-			//imprime nome do diretorio
-			case "pwd":
-				System.out.println(this.actualdirectory.name);
-				break;
-			//imprime a cadeia de diretorios conforme pedido
-			case "tree":
-				target = _inst.split(" ")[1];
-				break;
-			//deleta arquivo ou diretorio
-			case "rm":
-				target = _inst.split(" ")[1];
-				break;
-			default:
-				break;
+			if(this.name.compareTo(_name) == 0){
+				found = true;
+			}else{
+			
+			 if(this.right != null){
+				 if(this.right.exists(_name)){
+					 found = true;
+				 }
+			 }
+			  
+			  if(this.left != null){
+				  if(this.left.exists(_name)){
+					  found = true;
+				  }
+			  }
+			  
+		  }
 			
 		}
 		
 		
-		
-	}
-	
-}
-
-
-class tree{
-	
-	int value;
-	tree left;
-	tree right;
-	
-	public tree(int _value){
-		this.value = _value;
-	}
-	
-	
-	public void add(int _value){
-		
-		if(_value >= this.value){
-			if(this.right == null){
-				this.right = new tree(_value);
-			}else{
-				this.right.add(_value);
-			}
-		}else{
-			if(this.left == null){
-				this.left = new tree(_value);
-			}else{
-				this.left.add(_value);
-			}
-		}
-		
-	}
-	
-	
-	public boolean remove(int value, tree parent){
-        if (value < this.value) {
-              if (left != null)
-                    return left.remove(value, this);
-              else
-                    return false;
-        } else if (value > this.value) {
-              if (right != null)
-                    return right.remove(value, this);
-              else
-                    return false;
-        } else {
-              if (left != null && right != null) {
-                    this.value = right.minValue();
-                    right.remove(this.value, this);
-              } else if (parent.left == this) {
-                    parent.left = (left != null) ? left : right;
-              } else if (parent.right == this) {
-                    parent.right = (left != null) ? left : right;
-              }
-              return true;
-        }
+	  
+	  return found;
+	  
   }
-
-  public int minValue() {
-        if (left == null)
-              return value;
-        else
-              return left.minValue();
   
+  
+	//Verifica se existe o elemento na arvore
+	public file search(String _name){
+		  
+		file found = null;
+	  
+		if(this != null){
+		
+			if(this.name.equals(_name)){
+				found = this;
+			}else{
+			
+			if(this.right != null){
+				 found = this.right.search(_name);
+			 }
+			  
+			 if(this.left != null){
+				 found = this.left.search(_name);
+			 }
+			 
+			}
+			  
+		}
+			
+	  return found;
+	  
   }
+  
+  
+  
+
+  
+  
 
 
 //--------------------------------------------
@@ -198,7 +213,9 @@ class tree{
 			this.left.inorder();
 		}
 		
-		System.out.println(this.value);
+		if(this != null){
+			System.out.println(this.name);			
+		}
 		
 		if(this.right != null){
 			this.right.inorder();
@@ -209,7 +226,7 @@ class tree{
 	
 	public void preorder(){
 		
-		System.out.println(this.value);
+		System.out.println(this.name);
 
 		if(this.left != null){
 			this.left.preorder();
@@ -231,9 +248,170 @@ class tree{
 			this.right.postorder();
 		}
 		
-		System.out.println(this.value);
+		System.out.println(this.name);
 		
 	}
 	
 	
 }
+
+
+
+class directory extends file{
+	
+	directory parent;
+	file files;
+	
+	public directory(String _name, directory _parent){
+		super(_name, "directory");
+		this.parent = _parent;
+		files = null;
+		
+	}
+
+	
+	//lista elementos do diretório
+	public void ls(){
+		this.inorder();
+	}
+	
+	
+	//cria novo arquivo no diretorio atual
+	public void torch(String _name){
+		this.files.add(new file(_name, "file"));
+	}
+	
+	public void makedir(String _name){
+		this.files.add(new file(_name, "directory"));
+	}
+	
+	//imprime nome do diretorio
+	public void pwd(){
+		System.out.println(this.name);
+	}
+	
+	
+	//imprime a cadeia de diretorios conforme pedido
+	public void tree(String _type){
+		
+		switch (type) {
+		case "--pre-order":
+			files.preorder();
+			break;
+		case "--in-order":
+			files.inorder();
+			break;
+		case "--post-order":
+			files.postorder();
+			break;
+		default:
+			break;
+		}
+		System.out.println(this.name);
+	}
+	
+	//deleta arquivo ou diretorio
+	public void rm(String _name){
+		files.remove(_name, files);
+	}
+
+
+}
+
+
+class filesystem{
+	
+	directory actualdirectory;
+	directory root;
+	
+	public filesystem() {
+		//root serve como referencia para a raiz do sistema de arquivos
+		root = new directory("/", null);
+		this.actualdirectory = root;
+	}
+	
+	
+	public void instruction(String _inst){
+		
+		String inst = _inst.split(" ")[0];
+		String target = "";
+		
+		switch(inst){
+		
+			//entra no diretorio
+			case "cd":
+				target = _inst.split(" ")[1];
+				//subir de nivel
+				if(target.equals("..")){
+					if(actualdirectory.parent != null){
+						actualdirectory = actualdirectory.parent;						
+					}
+				}else{
+					if(actualdirectory.exists(target)){
+						if(actualdirectory.search(target).type.equals("directory")){
+							actualdirectory = (directory) actualdirectory.search(target);
+							System.out.println(actualdirectory.name);
+						}else{
+							System.out.println("Not a directory");
+						}
+					}else{
+						System.out.println("No such file or directory");
+					}
+				}
+				break;
+			//lista elementos do diretório
+			case "ls":
+				actualdirectory.ls();
+				break;
+			//cria novo arquivo no diretorio atual
+			case "touch":
+				target = _inst.split(" ")[1];
+				if(!actualdirectory.exists(target)){
+					actualdirectory.add(new file(target, "file"));
+				}else{
+					System.out.println("File exists");
+				}
+				break;
+			//cria diretório
+			case "mkdir":
+				target = _inst.split(" ")[1];
+				
+				if(!actualdirectory.exists(target)){
+					actualdirectory.add(new directory(target, actualdirectory));
+				}else{
+					System.out.println("File exists");
+				}
+				break;
+			//imprime nome do diretorio
+			case "pwd":
+				System.out.println(actualdirectory.name);
+				break;
+			//imprime a cadeia de diretorios conforme pedido
+			case "tree":
+				target = _inst.split(" ")[1];
+				if(target.equals("--pre-order") || target.equals("--in-order") || target.equals("--post-order")){
+					actualdirectory.tree(target);					
+				}else{
+					System.out.println("Illegal option");
+				}
+				break;
+			//deleta arquivo ou diretorio
+			case "rm":
+				target = _inst.split(" ")[1];
+				if(actualdirectory.exists(target)){
+					actualdirectory.remove(target, actualdirectory);
+				}else{
+					System.out.println("No such file or directory");
+				}
+				break;
+			default:
+				break;
+			
+		}
+		
+		
+		
+	}
+}
+
+
